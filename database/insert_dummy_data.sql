@@ -1,0 +1,31 @@
+insert into players values('Geodomus','testinfo');
+
+insert into ships values('Worcester', 'CL');
+insert into ships values('Des Moines','CA');
+insert into ships values('Montana','BB');
+insert into ships values('Midway','CV');
+insert into ships values('Z-52','DD');
+insert into ships values('Hindenburg','CA');
+insert into ships values('GK','BB');
+insert into ships values('Shimakaze','DD');
+insert into ships values('Harugumo','DD');
+insert into ships values('Yoshino','CA');
+insert into ships values('Zao','CA');
+insert into ships values('Yamato','BB');
+insert into ships values('Hakuryu','CV');
+insert into ships values('Khabarovsk','DD');
+insert into ships values('Grozovoi','DD');
+insert into ships values('Stalingrad','CA');
+insert into ships values('Moskva','CA');
+insert into ships values('Kreml','BB');
+insert into ships values('Daring','DD');
+insert into ships values('Minotaur','CL');
+insert into ships values('Conqueror','BB');
+insert into ships values('Audacious','CV');
+insert into ships values('Kléber','DD');
+insert into ships values('Henri IV','CA');
+insert into ships values('République','BB');
+insert into ships values('Bourgogne','BB');
+insert into ships values('Yueyang','DD');
+
+insert into PLAYER_HAS_SHIPS select 'Geodomus', SHIP_NAME from SHIPS where ship_name not in ('GK', 'Hindenburg');
