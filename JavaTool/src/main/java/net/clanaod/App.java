@@ -26,10 +26,6 @@ public class App
         Transaction t = session.beginTransaction();
 
         //Player p1 = session.get(Player.class, "Geodomus");
-        Player p1 = new Player("Taffy", "test");
-        Ship s2 = session.get(Ship.class, "GK");
-        p1.addShip(s2);
-        session.save(p1);
         t.commit();
         System.out.println("successfully saved");
         factory.close();

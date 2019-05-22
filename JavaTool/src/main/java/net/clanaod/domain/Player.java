@@ -56,6 +56,8 @@ public class Player {
         this.ships.add(ship);
     }
 
+    public void removeShip(Ship ship) {this.ships.remove(ship);}
+
     @Override
     public String toString() {
         return getPlayerName();
