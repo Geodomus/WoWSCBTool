@@ -1,32 +1,42 @@
 package net.clanaod.domain;
 
 import javax.persistence.*;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name="Players")
-public class Player {
+public class Player implements Comparable<Player> {
 
     @Id
+    @Column(name="player_ID")
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private int id;
     @Column(name="player_Name")
     private String playerName;
     @Column(name="player_Note")
     private String playerNote;
 
-    @ManyToMany(targetEntity = Ship.class, cascade = { CascadeType.ALL })
+    @ManyToMany(targetEntity = Ship.class, cascade = { CascadeType.ALL },fetch=FetchType.EAGER)
     @JoinTable(name = "Player_has_Ships",
-            joinColumns = { @JoinColumn(name = "Players_player_Name") },
-            inverseJoinColumns = { @JoinColumn(name = "Ships_ship_Name") })
-    private List<Ship> ships;
+            joinColumns = { @JoinColumn(name = "player_id") },
+            inverseJoinColumns = { @JoinColumn(name = "ship_id") })
+    private Set<Ship> ships;
 
     public Player(String playerName, String playerNote) {
         setPlayerName(playerName);
         setPlayerNote(playerNote);
-        this.ships = new ArrayList<Ship>();
+        this.ships = new HashSet<Ship>();
     }
     public Player(){}
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getPlayerName() {
         return playerName;
@@ -44,11 +54,11 @@ public class Player {
         this.playerNote = playerNote;
     }
 
-    public List<Ship> getShips() {
+    public Set<Ship> getShips() {
         return ships;
     }
 
-    public void setShips(List<Ship> ships) {
+    public void setShips(Set<Ship> ships) {
         this.ships = ships;
     }
 
@@ -61,5 +71,9 @@ public class Player {
     @Override
     public String toString() {
         return getPlayerName();
+    }
+
+    public int compareTo(Player p) {
+        return this.playerName.compareTo(p.playerName);
     }
 }

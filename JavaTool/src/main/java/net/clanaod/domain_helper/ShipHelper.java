@@ -1,6 +1,6 @@
 package net.clanaod.domain_helper;
 
-import net.clanaod.domain.Player;
+import net.clanaod.domain.Ship;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -12,9 +12,9 @@ import org.hibernate.query.Query;
 
 import java.util.List;
 
-public class PlayerHelper {
+public class ShipHelper {
 
-    public static List<Player> getPlayers(){
+    public static List<Ship> getAllShips(){
         StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
         Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
 
@@ -22,35 +22,39 @@ public class PlayerHelper {
         Session session = factory.openSession();
         Transaction t = session.beginTransaction();
 
-        String hql = "FROM Player";
+        String hql = "FROM Ship";
         Query query = session.createQuery(hql);
-        List<Player> playerList= query.list();
+        List<Ship> shipList = query.list();
         session.close();
-        return playerList;
+        return shipList;
     }
-    public static void deletePlayer(Player player){
+    public static Ship getShipByString(String shipString){
         StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
         Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
 
         SessionFactory factory = meta.getSessionFactoryBuilder().build();
         Session session = factory.openSession();
-        session.beginTransaction();
-        player.getShips().clear();
-        session.saveOrUpdate(player);
-        session.delete(player);
-        session.getTransaction().commit();
-        session.close();
-    }
+        Transaction t = session.beginTransaction();
 
-    public static void savePlayer(Player player){
+        String hql = "FROM Ship where shipName = :shipName and shipType = :shipType";
+        Query q = session.createQuery(hql);
+        String[] sa = shipString.split("[\\(||\\)]");
+        System.out.println(sa);
+        q.setParameter("shipName",shipString.split("[\\(||\\)]")[0]);
+        q.setParameter("shipType",shipString.split("[\\(||\\)]")[1]);
+        Ship ship = (Ship)q.getSingleResult();
+        session.close();
+        return ship;
+    }
+    public static void addShip(String shipName, String shipType){
         StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
         Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
 
         SessionFactory factory = meta.getSessionFactoryBuilder().build();
         Session session = factory.openSession();
-        session.beginTransaction();
-
-        session.saveOrUpdate(player);
+        Transaction t = session.beginTransaction();
+        Ship s = new Ship(shipName, shipType);
+        session.saveOrUpdate(s);
         session.getTransaction().commit();
         session.close();
     }
