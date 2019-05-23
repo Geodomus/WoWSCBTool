@@ -76,7 +76,39 @@ public class MainView {
         comboBox8.setModel(new DefaultComboBoxModel(oa));
     }
 
+    public void loadShips(){
+        ShipHelper.addShip("Des Moines","CA");
+        ShipHelper.addShip("Montana","BB");
+        ShipHelper.addShip("Midway","CV");
+        ShipHelper.addShip("Z-52","DD");
+        ShipHelper.addShip("Hindenburg","CA");
+        ShipHelper.addShip("GK","BB");
+        ShipHelper.addShip("Shimakaze","DD");
+        ShipHelper.addShip("Harugumo","DD");
+        ShipHelper.addShip("Yoshino","CA");
+        ShipHelper.addShip("Zao","CA");
+        ShipHelper.addShip("Yamato","BB");
+        ShipHelper.addShip("Hakuryu","CV");
+        ShipHelper.addShip("Khabarovsk","DD");
+        ShipHelper.addShip("Grozovoi","DD");
+        ShipHelper.addShip("Stalingrad","CA");
+        ShipHelper.addShip("Moskva","CA");
+        ShipHelper.addShip("Kreml","BB");
+        ShipHelper.addShip("Daring","DD");
+        ShipHelper.addShip("Minotaur","CL");
+        ShipHelper.addShip("Conqueror","BB");
+        ShipHelper.addShip("Audacious","CV");
+        ShipHelper.addShip("Kléber","DD");
+        ShipHelper.addShip("Henri IV","CA");
+        ShipHelper.addShip("République","BB");
+        ShipHelper.addShip("Bourgogne","BB");
+        ShipHelper.addShip("Yueyang","DD");
+    }
+
     public MainView() {
+        if(ShipHelper.getAllShips().size() == 0){
+            loadShips();
+        }
         List<Ship> shipList = ShipHelper.getAllShips();
         Collections.sort(shipList);
         label1.setText("");
@@ -107,7 +139,6 @@ public class MainView {
                     }else {
                         player.removeShip(ShipHelper.getShipByString(jtb1.getText()));
                     }
-                    System.out.println(player.getShips());
                 }
             });
             shipPanel.add(jtb);
@@ -603,6 +634,8 @@ public class MainView {
                 player.setPlayerName(playerName.getText());
                 player.setPlayerNote(playerNotes.getText());
                 PlayerHelper.savePlayer(player);
+                playerName.setText("");
+                playerNotes.setText("");
                 refreshComboBoxes();
                 loadButton.setEnabled(false);
                 saveButton.setEnabled(false);

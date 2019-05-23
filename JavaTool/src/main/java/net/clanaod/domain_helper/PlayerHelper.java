@@ -1,6 +1,7 @@
 package net.clanaod.domain_helper;
 
 import net.clanaod.domain.Player;
+import net.clanaod.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -15,10 +16,7 @@ import java.util.List;
 public class PlayerHelper {
 
     public static List<Player> getPlayers(){
-        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
-        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
-
-        SessionFactory factory = meta.getSessionFactoryBuilder().build();
+        SessionFactory factory = HibernateUtil.getSessionFactory();
         Session session = factory.openSession();
         Transaction t = session.beginTransaction();
 
@@ -29,10 +27,7 @@ public class PlayerHelper {
         return playerList;
     }
     public static void deletePlayer(Player player){
-        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
-        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
-
-        SessionFactory factory = meta.getSessionFactoryBuilder().build();
+        SessionFactory factory = HibernateUtil.getSessionFactory();
         Session session = factory.openSession();
         session.beginTransaction();
         player.getShips().clear();
@@ -43,10 +38,7 @@ public class PlayerHelper {
     }
 
     public static void savePlayer(Player player){
-        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
-        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
-
-        SessionFactory factory = meta.getSessionFactoryBuilder().build();
+        SessionFactory factory = HibernateUtil.getSessionFactory();
         Session session = factory.openSession();
         session.beginTransaction();
 

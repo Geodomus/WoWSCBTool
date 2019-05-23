@@ -1,17 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-        <!DOCTYPE hibernate-configuration PUBLIC
-                "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-                "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 
 <hibernate-configuration>
     <session-factory>
 
-        <property name="hibernate.dialect">org.hibernate.dialect.DerbyTenSevenDialect</property>
-        <property name="hibernate.connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
-        <property name="hibernate.connection.url">jdbc:derby:myEmbeddedDB;create=true</property>
-        <property name="hibernate.connection.username">test</property>
-        <property name="hibernate.connection.password">test</property>
-        <property name="hibernate.hbm2ddl.auto">validate</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://192.168.0.59:3306/wows_dev?characterEncoding=utf8</property>
+        <property name="hibernate.connection.username">wows_dev</property>
+        <property name="hibernate.connection.password">AOD_omegared</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
 
         <mapping class="net.clanaod.domain.Player"/>
         <mapping class="net.clanaod.domain.Ship"/>

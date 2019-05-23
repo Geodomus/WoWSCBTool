@@ -1,5 +1,7 @@
 package net.clanaod.domain;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,6 +17,7 @@ public class Player implements Comparable<Player> {
     @Column(name="player_Name")
     private String playerName;
     @Column(name="player_Note")
+    @Type(type="text")
     private String playerNote;
 
     @ManyToMany(targetEntity = Ship.class, cascade = { CascadeType.ALL },fetch=FetchType.EAGER)
