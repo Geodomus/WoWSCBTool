@@ -4,21 +4,16 @@ import net.clanaod.domain.Player;
 import net.clanaod.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.query.Query;
 
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class PlayerHelper {
 
     public static List<Player> getPlayers(){
         SessionFactory factory = HibernateUtil.getSessionFactory();
         Session session = factory.openSession();
-        Transaction t = session.beginTransaction();
 
         String hql = "FROM Player";
         Query query = session.createQuery(hql);

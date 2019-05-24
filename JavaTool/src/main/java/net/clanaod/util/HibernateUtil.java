@@ -22,9 +22,11 @@ public class HibernateUtil {
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             try {
-                File f = new File(System.getProperty("user.home").toString()+"\\WoWSCBTool");
+                File f = new File(System.getProperty("user.home") +"\\WoWSCBTool");
                 boolean b = f.mkdirs();
-                f = new File(System.getProperty("user.home").toString()+"\\WoWSCBTool\\hibernate.cfg.xml");
+                if(b){
+                f = new File(System.getProperty("user.home") +"\\WoWSCBTool\\hibernate.cfg.xml");}
+                else f = new File("hibernate.cfg.xml");
                 StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure(f).build();
                 Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
 

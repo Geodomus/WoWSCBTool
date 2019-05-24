@@ -13,6 +13,7 @@ public class Player implements Comparable<Player> {
     @Id
     @Column(name="player_ID")
     @GeneratedValue(strategy=GenerationType.AUTO)
+    @SuppressWarnings("unused")
     private int id;
     @Column(name="player_Name")
     private String playerName;
@@ -32,14 +33,6 @@ public class Player implements Comparable<Player> {
         this.ships = new HashSet<Ship>();
     }
     public Player(){}
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getPlayerName() {
         return playerName;

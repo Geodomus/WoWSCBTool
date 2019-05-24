@@ -24,7 +24,7 @@ public class Ship implements Comparable<Ship>{
         return shipName;
     }
 
-    public void setShipName(String shipName) {
+    private void setShipName(String shipName) {
         this.shipName = shipName;
     }
 
@@ -32,7 +32,7 @@ public class Ship implements Comparable<Ship>{
         return shipType;
     }
 
-    public void setShipType(String shipType) {
+    private void setShipType(String shipType) {
         this.shipType = shipType;
     }
 
@@ -54,6 +54,13 @@ public class Ship implements Comparable<Ship>{
     public int hashCode() {
         String str = shipName + "("+shipType+")";
         return str.hashCode();
+    }
+
+    public String getPublicString(){
+        return getShipName() +
+                "(" +
+                getShipType() +
+                ")";
     }
 
     public int compareTo(Ship o) {
