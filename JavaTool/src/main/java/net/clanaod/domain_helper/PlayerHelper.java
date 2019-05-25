@@ -36,7 +36,6 @@ public class PlayerHelper {
         SessionFactory factory = HibernateUtil.getSessionFactory();
         Session session = factory.openSession();
         session.beginTransaction();
-
         session.saveOrUpdate(player);
         session.getTransaction().commit();
         session.close();

@@ -1,6 +1,9 @@
 package net.clanaod.view;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,8 +50,15 @@ class MainView {
     private JTextField playerName;
     private JTextArea playerNotes;
     private JPanel shipPanel;
+    private JButton newButton1;
+    private JButton saveButton1;
+    private JTextField shipName;
+    private JTextField shipType;
+    private JPanel shipsPanel;
     private Player player;
     private final ArrayList<JToggleButton> buttonList;
+    private final ArrayList<JButton> shipButtonList;
+    private List<Ship> shipList;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("MainView");
@@ -113,7 +123,7 @@ class MainView {
 
     private MainView() {
         loadShips();
-        List<Ship> shipList = ShipHelper.getAllShips();
+        shipList = ShipHelper.getAllShips();
         Collections.sort(shipList);
         label1.setText("");
         label2.setText("");
@@ -130,26 +140,22 @@ class MainView {
         label13.setText("");
         label14.setText("");
         refreshComboBoxes();
+        playerName.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                changed();
+            }
+            public void removeUpdate(DocumentEvent e) {
+                changed();
+            }
+            public void insertUpdate(DocumentEvent e) {
+                changed();
+            }
+        });
         shipPanel.setLayout(new GridLayout(0,4));
         buttonList = new ArrayList<JToggleButton>();
-        for(Ship ship : shipList){
-            JToggleButton jtb = new JToggleButton(ship.getShipName() + "(" + ship.getShipType()+ ")");
-            jtb.setEnabled(false);
-            jtb.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    JToggleButton jtb1 = (JToggleButton)e.getSource();
-                    if(jtb1.isSelected()){
-                        player.addShip(ShipHelper.getShipByString(jtb1.getText()));
-                    }else {
-                        player.removeShip(ShipHelper.getShipByString(jtb1.getText()));
-                    }
-                }
-            });
-            shipPanel.add(jtb);
-            buttonList.add(jtb);
-        }
-
-
+        shipButtonList = new ArrayList<JButton>();
+        shipsPanel.setLayout(new GridLayout(0, 8));
+        refreshShips();
 
         comboBox1.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -704,7 +710,7 @@ class MainView {
                         button.setEnabled(true);
                 }
                 player = (Player)comboBox8.getSelectedItem();
-                //TODO: Make sure player has a name
+                tabbedPane1.setEnabledAt(2, false);
                 playerName.setText(player.getPlayerName());
                 playerName.setEnabled(true);
                 playerNotes.setText(player.getPlayerNote());
@@ -728,6 +734,7 @@ class MainView {
                     button.setEnabled(true);
                 }
                 player.setShips(new HashSet<Ship>());
+                tabbedPane1.setEnabledAt(2, false);
                 playerName.setEnabled(true);
                 playerName.setText("");
                 playerNotes.setEnabled(true);
@@ -750,6 +757,7 @@ class MainView {
         deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 playerName.setEnabled(false);
+                tabbedPane1.setEnabledAt(2, true);
                 playerName.setText("");
                 playerNotes.setEnabled(false);
                 playerNotes.setText("");
@@ -763,6 +771,7 @@ class MainView {
                 player.setPlayerNote(playerNotes.getText());
                 PlayerHelper.savePlayer(player);
                 playerName.setEnabled(false);
+                tabbedPane1.setEnabledAt(2, true);
                 playerName.setText("");
                 playerNotes.setEnabled(false);
                 playerNotes.setText("");
@@ -776,5 +785,77 @@ class MainView {
                 }
             }
         });
+        newButton1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                shipName.setEnabled(true);
+                shipType.setEnabled(true);
+                saveButton1.setEnabled(true);
+            }
+        });
+        saveButton1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ShipHelper.importShip(shipName.getText(), shipType.getText());
+                shipName.setText("");
+                shipType.setText("");
+                shipName.setEnabled(false);
+                shipType.setEnabled(false);
+                saveButton1.setEnabled(false);
+                shipList = ShipHelper.getAllShips();
+                Collections.sort(shipList);
+                refreshShips();
+            }
+        });
+    }
+
+    public void changed() {
+        if (playerName.getText().equals("")){
+            saveButton.setEnabled(false);
+        }
+        else {
+            saveButton.setEnabled(true);
+        }
+    }
+
+    public void refreshShips(){
+        shipList = ShipHelper.getAllShips();
+        Collections.sort(shipList);
+        shipPanel.removeAll();
+        shipsPanel.removeAll();
+        for(Ship ship : shipList){
+            JToggleButton jtb = new JToggleButton(ship.getShipName() + "(" + ship.getShipType()+ ")");
+            jtb.setEnabled(false);
+            jtb.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JToggleButton jtb1 = (JToggleButton)e.getSource();
+                    if(jtb1.isSelected()){
+                        player.addShip(ShipHelper.getShipByPublicString(jtb1.getText()));
+                    }else {
+                        player.removeShip(ShipHelper.getShipByPublicString(jtb1.getText()));
+                    }
+                }
+            });
+            shipPanel.add(jtb);
+            buttonList.add(jtb);
+            JButton jb = new JButton();
+            ImageIcon imageIcon = new ImageIcon(getClass().getClassLoader()
+                    .getResource("trash.png"));
+            jb.setIcon(imageIcon);
+            jb.setName(ship.getPublicString());
+            jb.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JButton b = (JButton)e.getSource();
+                    ShipHelper.deleteShipByPublicString(b.getName());
+                    refreshShips();
+                }
+            });
+            JLabel l = new JLabel(ship.getPublicString());
+            l.setHorizontalAlignment(JLabel.RIGHT);
+            shipsPanel.add(l);
+            shipsPanel.add(jb);
+        }
+        shipPanel.revalidate();
+        shipPanel.repaint();
+        shipsPanel.revalidate();
+        shipsPanel.repaint();
     }
 }
