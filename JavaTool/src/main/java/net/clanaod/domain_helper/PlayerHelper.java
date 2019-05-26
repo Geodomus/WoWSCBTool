@@ -15,7 +15,6 @@ public class PlayerHelper {
     public static List<Player> getPlayers(){
         SessionFactory factory = HibernateUtil.getSessionFactory();
         Session session = factory.openSession();
-
         String hql = "FROM Player";
         Query query = session.createQuery(hql);
         List<Player> playerList= query.list();

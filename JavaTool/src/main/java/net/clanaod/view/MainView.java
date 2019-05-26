@@ -1,6 +1,5 @@
 package net.clanaod.view;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -45,7 +44,7 @@ class MainView {
     private JLabel label12;
     private JLabel label13;
     private JLabel label14;
-    private JComboBox comboBox8;
+    private JComboBox playerComboBox;
     private JButton loadButton;
     private JButton newButton;
     private JButton deleteButton;
@@ -62,6 +61,10 @@ class MainView {
     private JComboBox dayComboBox;
     private JPanel timePanel;
     private Player player;
+    private final JComboBox[] jComboBoxes;
+    private final JLabel[] noteLabels;
+    private final JLabel[] shipLabels;
+
     private final ArrayList<JToggleButton> buttonList;
     private final ArrayList<JButton> shipButtonList;
     private List<Ship> shipList;
@@ -91,7 +94,7 @@ class MainView {
         comboBox5.setModel(new DefaultComboBoxModel(oa));
         comboBox6.setModel(new DefaultComboBoxModel(oa));
         comboBox7.setModel(new DefaultComboBoxModel(oa));
-        comboBox8.setModel(new DefaultComboBoxModel(oa));
+        playerComboBox.setModel(new DefaultComboBoxModel(oa));
 
         List<Day> dayList = DayHelper.getAllDays();
         Collections.sort(dayList);
@@ -151,31 +154,33 @@ class MainView {
         loadShips();
         loadDays();
         shipList = ShipHelper.getAllShips();
+        jComboBoxes = new JComboBox[7];
+        shipLabels = new JLabel[7];
+        noteLabels = new JLabel[7];
         Collections.sort(shipList);
-        label1.setText("");
-        label2.setText("");
-        label3.setText("");
-        label4.setText("");
-        label5.setText("");
-        label6.setText("");
-        label7.setText("");
-        label8.setText("");
-        label9.setText("");
-        label10.setText("");
-        label11.setText("");
-        label12.setText("");
-        label13.setText("");
-        label14.setText("");
         refreshComboBoxes();
-        playerName.getDocument().addDocumentListener(new DocumentListener() {
+        initializeArrays();
+        refreshAllLabels();
+        shipName.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
-                changed();
+                changed(shipName, saveButton1);
             }
             public void removeUpdate(DocumentEvent e) {
-                changed();
+                changed(shipName, saveButton1);
             }
             public void insertUpdate(DocumentEvent e) {
-                changed();
+                changed(shipName, saveButton1);
+            }
+        });
+        playerName.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                changed(playerName, saveButton);
+            }
+            public void removeUpdate(DocumentEvent e) {
+                changed(playerName, saveButton);
+            }
+            public void insertUpdate(DocumentEvent e) {
+                changed(playerName, saveButton);
             }
         });
         timePanel.setLayout(new GridLayout(0,6));
@@ -184,561 +189,14 @@ class MainView {
         shipButtonList = new ArrayList<JButton>();
         shipsPanel.setLayout(new GridLayout(0, 8));
         refreshShips();
-
-        comboBox1.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (e.getItem() instanceof Player) {
-                        Player p1 = (Player) e.getItem();
-                        Set<Ship> shipSet = p1.getShips();
-                        ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
-                        Collections.sort(shipList);
-                        label2.setText("<html>"+p1.getPlayerNote()+"</html>");
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("<html>");
-                        if (shipList.size() < 8) {
-                            for (Ship ship : shipList) {
-                                sb.append(ship.getPublicString());
-                                sb.append("<br>");
-                            }
-                        } else if (shipList.size() < 15) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px}table {border-spacing: 10px 0;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 2 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:71px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else if (shipList.size() < 22) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 3 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 3 == 1) {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 4 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 4 != 3) {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        }
-                        sb.append("</html>");
-                        label1.setText(sb.toString());
-                    }
-                } else {
-                    label1.setText("");
-                }
-            }
-        });
-        comboBox2.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (e.getItem() instanceof Player) {
-                        Player p1 = (Player) e.getItem();
-                        Set<Ship> shipSet = p1.getShips();
-                        ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
-                        Collections.sort(shipList);
-                        label4.setText("<html>"+p1.getPlayerNote()+"</html>");
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("<html>");
-                        if (shipList.size() < 8) {
-                            for (Ship ship : shipList) {
-                                sb.append(ship.getPublicString());
-                                sb.append("<br>");
-                            }
-                        } else if (shipList.size() < 15) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px}table {border-spacing: 10px 0;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 2 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:71px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else if (shipList.size() < 22) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 3 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 3 == 1) {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 4 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 4 != 3) {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        }
-                        sb.append("</html>");
-                        label3.setText(sb.toString());
-                    }
-                } else {
-                    label3.setText("");
-                }
-            }
-        });
-        comboBox3.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (e.getItem() instanceof Player) {
-                        Player p1 = (Player) e.getItem();
-                        Set<Ship> shipSet = p1.getShips();
-                        ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
-                        Collections.sort(shipList);
-                        label6.setText("<html>"+p1.getPlayerNote()+"</html>");
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("<html>");
-                        if (shipList.size() < 8) {
-                            for (Ship ship : shipList) {
-                                sb.append(ship.getPublicString());
-                                sb.append("<br>");
-                            }
-                        } else if (shipList.size() < 15) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px}table {border-spacing: 10px 0;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 2 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:71px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else if (shipList.size() < 22) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 3 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 3 == 1) {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 4 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 4 != 3) {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        }
-                        sb.append("</html>");
-                        label5.setText(sb.toString());
-                    }
-                } else {
-                    label5.setText("");
-                }
-            }
-        });
-        comboBox4.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (e.getItem() instanceof Player) {
-                        Player p1 = (Player) e.getItem();
-                        Set<Ship> shipSet = p1.getShips();
-                        ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
-                        Collections.sort(shipList);
-                        label8.setText("<html>"+p1.getPlayerNote()+"</html>");
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("<html>");
-                        if (shipList.size() < 8) {
-                            for (Ship ship : shipList) {
-                                sb.append(ship.getPublicString());
-                                sb.append("<br>");
-                            }
-                        } else if (shipList.size() < 15) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px}table {border-spacing: 10px 0;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 2 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:71px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else if (shipList.size() < 22) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 3 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 3 == 1) {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 4 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 4 != 3) {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        }
-                        sb.append("</html>");
-                        label7.setText(sb.toString());
-                    }
-                } else {
-                    label7.setText("");
-                }
-            }
-        });
-        comboBox5.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (e.getItem() instanceof Player) {
-                        Player p1 = (Player) e.getItem();
-                        Set<Ship> shipSet = p1.getShips();
-                        ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
-                        Collections.sort(shipList);
-                        label10.setText("<html>"+p1.getPlayerNote()+"</html>");
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("<html>");
-                        if (shipList.size() < 8) {
-                            for (Ship ship : shipList) {
-                                sb.append(ship.getPublicString());
-                                sb.append("<br>");
-                            }
-                        } else if (shipList.size() < 15) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px}table {border-spacing: 10px 0;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 2 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:71px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else if (shipList.size() < 22) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 3 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 3 == 1) {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 4 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 4 != 3) {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        }
-                        sb.append("</html>");
-                        label9.setText(sb.toString());
-                    }
-                } else {
-                    label9.setText("");
-                }
-            }
-        });
-        comboBox6.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (e.getItem() instanceof Player) {
-                        Player p1 = (Player) e.getItem();
-                        Set<Ship> shipSet = p1.getShips();
-                        ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
-                        Collections.sort(shipList);
-                        label13.setText("<html>"+p1.getPlayerNote()+"</html>");
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("<html>");
-                        if (shipList.size() < 8) {
-                            for (Ship ship : shipList) {
-                                sb.append(ship.getPublicString());
-                                sb.append("<br>");
-                            }
-                        } else if (shipList.size() < 15) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px}table {border-spacing: 10px 0;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 2 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:71px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else if (shipList.size() < 22) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 3 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 3 == 1) {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 4 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 4 != 3) {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        }
-                        sb.append("</html>");
-                        label11.setText(sb.toString());
-                    }
-                } else {
-                    label11.setText("");
-                }
-            }
-        });
-        comboBox7.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (e.getItem() instanceof Player) {
-                        Player p1 = (Player) e.getItem();
-                        Set<Ship> shipSet = p1.getShips();
-                        ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
-                        Collections.sort(shipList);
-                        label14.setText("<html>"+p1.getPlayerNote()+"</html>");
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("<html>");
-                        if (shipList.size() < 8) {
-                            for (Ship ship : shipList) {
-                                sb.append(ship.getPublicString());
-                                sb.append("<br>");
-                            }
-                        } else if (shipList.size() < 15) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px}table {border-spacing: 10px 0;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 2 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:71px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else if (shipList.size() < 22) {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 3 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 3 == 1) {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td style=\"padding-left:35px\">");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        } else {
-                            sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
-                            sb.append("<table>");
-                            for (int i = 0; i < shipList.size(); i++) {
-                                if (i % 4 == 0) {
-                                    sb.append("<tr><td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else if (i % 4 != 3) {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td>");
-                                } else {
-                                    sb.append("<td>");
-                                    sb.append(shipList.get(i).getPublicString());
-                                    sb.append("</td></tr>");
-                                }
-                            }
-                            sb.append("</table>");
-                        }
-                        sb.append("</html>");
-                        label12.setText(sb.toString());
-                    }
-                } else {
-                    label12.setText("");
-                }
-            }
-        });
         loadButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 for(JToggleButton button : buttonList){
                         button.setSelected(false);
                         button.setEnabled(true);
                 }
-                player = (Player)comboBox8.getSelectedItem();
-                tabbedPane1.setEnabledAt(2, false);
+                player = (Player) playerComboBox.getSelectedItem();
+                tabbedPane1.setEnabledAt(3, false);
                 playerName.setText(player.getPlayerName());
                 playerName.setEnabled(true);
                 playerNotes.setText(player.getPlayerNote());
@@ -763,17 +221,18 @@ class MainView {
                     button.setEnabled(true);
                 }
                 player.setShips(new HashSet<Ship>());
-                tabbedPane1.setEnabledAt(2, false);
+                tabbedPane1.setEnabledAt(3, false);
                 playerName.setEnabled(true);
                 playerName.setText("");
                 playerNotes.setEnabled(true);
                 playerNotes.setText("");
                 deleteButton.setEnabled(false);
+                saveButton.setEnabled(false);
                 dayButton.setEnabled(false);
                 saveButton.setEnabled(true);
             }
         });
-        comboBox8.addItemListener(new ItemListener() {
+        playerComboBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if(e.getStateChange() == ItemEvent.SELECTED) {
                     if (e.getItem() instanceof Player) {
@@ -787,13 +246,15 @@ class MainView {
         deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 playerName.setEnabled(false);
-                tabbedPane1.setEnabledAt(2, true);
+                tabbedPane1.setEnabledAt(3, true);
                 playerName.setText("");
                 playerNotes.setEnabled(false);
                 playerNotes.setText("");
                 dayButton.setEnabled(false);
+                deleteButton.setEnabled(false);
                 PlayerHelper.deletePlayer(player);
                 refreshComboBoxes();
+                refreshAllLabels();
             }
         });
         saveButton.addActionListener(new ActionListener() {
@@ -802,7 +263,7 @@ class MainView {
                 player.setPlayerNote(playerNotes.getText());
                 PlayerHelper.savePlayer(player);
                 playerName.setEnabled(false);
-                tabbedPane1.setEnabledAt(2, true);
+                tabbedPane1.setEnabledAt(3, true);
                 playerName.setText("");
                 playerNotes.setEnabled(false);
                 playerNotes.setText("");
@@ -819,9 +280,9 @@ class MainView {
         });
         newButton1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                saveButton1.setEnabled(false);
                 shipName.setEnabled(true);
                 shipType.setEnabled(true);
-                saveButton1.setEnabled(true);
             }
         });
         saveButton1.addActionListener(new ActionListener() {
@@ -878,12 +339,12 @@ class MainView {
         });
     }
 
-    public void changed() {
-        if (playerName.getText().equals("")){
-            saveButton.setEnabled(false);
+    public void changed(JTextField jtf, JButton jb) {
+        if (jtf.getText().equals("")){
+            jb.setEnabled(false);
         }
         else {
-            saveButton.setEnabled(true);
+            jb.setEnabled(true);
         }
     }
 
@@ -928,5 +389,138 @@ class MainView {
         shipPanel.repaint();
         shipsPanel.revalidate();
         shipsPanel.repaint();
+    }
+
+    public void initializeArrays(){
+        jComboBoxes[0]= comboBox1;
+        jComboBoxes[1]= comboBox2;
+        jComboBoxes[2]= comboBox3;
+        jComboBoxes[3]= comboBox4;
+        jComboBoxes[4]= comboBox5;
+        jComboBoxes[5]= comboBox6;
+        jComboBoxes[6]= comboBox7;
+        shipLabels[0]=label1;
+        shipLabels[1]=label3;
+        shipLabels[2]=label5;
+        shipLabels[3]=label7;
+        shipLabels[4]=label9;
+        shipLabels[5]=label11;
+        shipLabels[6]=label12;
+        noteLabels[0]=label2;
+        noteLabels[1]=label4;
+        noteLabels[2]=label6;
+        noteLabels[3]=label8;
+        noteLabels[4]=label10;
+        noteLabels[5]=label13;
+        noteLabels[6]=label14;
+        for(int i=0;i<7;i++){
+            jComboBoxes[i].addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {
+                    for(int i=0;i<7;i++){
+                        if(e.getSource().equals(jComboBoxes[i])){
+                            if(e.getStateChange() == ItemEvent.SELECTED) {
+                                if(e.getItem() instanceof Player){
+                                    comboBoxChange(i,(Player)e.getItem());
+                                } else {
+                                    comboBoxChange(i,null);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    public void comboBoxChange(int counter, Player player) {
+        if(player != null){
+            Set<Ship> shipSet = player.getShips();
+            ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
+            Collections.sort(shipList);
+            noteLabels[counter].setText("<html>" + player.getPlayerNote() + "</html>");
+            StringBuilder sb = new StringBuilder();
+            sb.append("<html>");
+            if (shipList.size() < 8) {
+                for (Ship ship : shipList) {
+                    sb.append(ship.getPublicString());
+                    sb.append("<br>");
+                }
+            } else if (shipList.size() < 15) {
+                sb.append("<style> table, th, td {border: 0px;padding: 0px}table {border-spacing: 10px 0;}</style>");
+                sb.append("<table>");
+                for (int i = 0; i < shipList.size(); i++) {
+                    if (i % 2 == 0) {
+                        sb.append("<tr><td>");
+                        sb.append(shipList.get(i).getPublicString());
+                        sb.append("</td>");
+                    } else {
+                        sb.append("<td style=\"padding-left:71px\">");
+                        sb.append(shipList.get(i).getPublicString());
+                        sb.append("</td></tr>");
+                    }
+                }
+                sb.append("</table>");
+            } else if (shipList.size() < 22) {
+                sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
+                sb.append("<table>");
+                for (int i = 0; i < shipList.size(); i++) {
+                    if (i % 3 == 0) {
+                        sb.append("<tr><td>");
+                        sb.append(shipList.get(i).getPublicString());
+                        sb.append("</td>");
+                    } else if (i % 3 == 1) {
+                        sb.append("<td style=\"padding-left:35px\">");
+                        sb.append(shipList.get(i).getPublicString());
+                        sb.append("</td>");
+                    } else {
+                        sb.append("<td style=\"padding-left:35px\">");
+                        sb.append(shipList.get(i).getPublicString());
+                        sb.append("</td></tr>");
+                    }
+                }
+                sb.append("</table>");
+            } else {
+                sb.append("<style> table, th, td {border: 0px;padding: 0px;}table {border-spacing: 0px;}</style>");
+                sb.append("<table>");
+                for (int i = 0; i < shipList.size(); i++) {
+                    if (i % 4 == 0) {
+                        sb.append("<tr><td>");
+                        sb.append(shipList.get(i).getPublicString());
+                        sb.append("</td>");
+                    } else if (i % 4 != 3) {
+                        sb.append("<td>");
+                        sb.append(shipList.get(i).getPublicString());
+                        sb.append("</td>");
+                    } else {
+                        sb.append("<td>");
+                        sb.append(shipList.get(i).getPublicString());
+                        sb.append("</td></tr>");
+                    }
+                }
+                sb.append("</table>");
+            }
+            sb.append("</html>");
+            shipLabels[counter].setText(sb.toString());
+        } else {
+            shipLabels[counter].setText("");
+            noteLabels[counter].setText("");
+        }
+    }
+
+    public void refreshLabels(JComboBox jcb){
+        for(int i=0;i<7;i++){
+            if(jComboBoxes[i].equals(jcb)){
+                comboBoxChange(i,null);
+            }
+        }
+    }
+    public void refreshAllLabels(){
+        refreshLabels(comboBox1);
+        refreshLabels(comboBox2);
+        refreshLabels(comboBox3);
+        refreshLabels(comboBox4);
+        refreshLabels(comboBox5);
+        refreshLabels(comboBox6);
+        refreshLabels(comboBox7);
     }
 }
