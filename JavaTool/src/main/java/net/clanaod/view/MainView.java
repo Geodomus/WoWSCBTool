@@ -87,13 +87,27 @@ class MainView {
         for (int i = 0; i < playerList.size(); i++) {
             oa[i + 1] = playerList.get(i);
         }
+        Object o = comboBox1.getSelectedItem();
         comboBox1.setModel(new DefaultComboBoxModel(oa));
+        comboBox1.setSelectedItem(o);
+        o = comboBox2.getSelectedItem();
         comboBox2.setModel(new DefaultComboBoxModel(oa));
+        comboBox2.setSelectedItem(o);
+        o = comboBox3.getSelectedItem();
         comboBox3.setModel(new DefaultComboBoxModel(oa));
+        comboBox3.setSelectedItem(o);
+        o = comboBox4.getSelectedItem();
         comboBox4.setModel(new DefaultComboBoxModel(oa));
+        comboBox4.setSelectedItem(o);
+        o = comboBox5.getSelectedItem();
         comboBox5.setModel(new DefaultComboBoxModel(oa));
+        comboBox5.setSelectedItem(o);
+        o = comboBox6.getSelectedItem();
         comboBox6.setModel(new DefaultComboBoxModel(oa));
+        comboBox6.setSelectedItem(o);
+        o = comboBox7.getSelectedItem();
         comboBox7.setModel(new DefaultComboBoxModel(oa));
+        comboBox7.setSelectedItem(o);
         playerComboBox.setModel(new DefaultComboBoxModel(oa));
 
         List<Day> dayList = DayHelper.getAllDays();
@@ -255,6 +269,10 @@ class MainView {
                 PlayerHelper.deletePlayer(player);
                 refreshComboBoxes();
                 refreshAllLabels();
+                for(JToggleButton button : buttonList){
+                    button.setSelected(false);
+                    button.setEnabled(true);
+                }
             }
         });
         saveButton.addActionListener(new ActionListener() {
