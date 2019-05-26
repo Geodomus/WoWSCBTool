@@ -11,6 +11,10 @@ import java.util.Set;
 @Table(name="Players")
 public class Player implements Comparable<Player> {
 
+    public int getId() {
+        return id;
+    }
+
     @Id
     @Column(name="player_ID")
     @GeneratedValue(strategy=GenerationType.AUTO)

@@ -5,16 +5,26 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="Days")
-public class Day {
+public class Day implements Comparable<Day>{
     public int getId() {
         return id;
     }
 
     @Id
-    @Column(name="player_ID")
+    @Column(name="day_ID")
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int id;
 
+    public void setDayNumber(byte dayNumber) {
+        this.dayNumber = dayNumber;
+    }
+
+    public byte getDayNumber() {
+        return dayNumber;
+    }
+
+    @Column
+    private byte dayNumber;
     public String getWeekday() {
         return weekday;
     }
@@ -33,5 +43,14 @@ public class Day {
         } else {
             return false;
         }
+    }
+
+    public int compareTo(Day o) {
+        return getDayNumber() - o.getDayNumber();
+    }
+
+    @Override
+    public String toString() {
+        return getWeekday();
     }
 }

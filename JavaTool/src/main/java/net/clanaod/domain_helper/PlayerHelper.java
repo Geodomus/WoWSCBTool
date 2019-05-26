@@ -1,6 +1,7 @@
 package net.clanaod.domain_helper;
 
 import net.clanaod.domain.Player;
+import net.clanaod.domain.PlayerPlaysDay;
 import net.clanaod.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -22,6 +23,7 @@ public class PlayerHelper {
         return playerList;
     }
     public static void deletePlayer(Player player){
+        deletePlayerDays(player);
         SessionFactory factory = HibernateUtil.getSessionFactory();
         Session session = factory.openSession();
         session.beginTransaction();
@@ -37,6 +39,21 @@ public class PlayerHelper {
         Session session = factory.openSession();
         session.beginTransaction();
         session.saveOrUpdate(player);
+        session.getTransaction().commit();
+        session.close();
+    }
+
+    public static void deletePlayerDays(Player player){
+        SessionFactory factory = HibernateUtil.getSessionFactory();
+        Session session = factory.openSession();
+        session.beginTransaction();
+        String hql = "FROM PlayerPlaysDay where player = :player";
+        Query q = session.createQuery(hql);
+        q.setParameter("player",player);
+        List<PlayerPlaysDay> playerList= q.list();
+        for(PlayerPlaysDay ppd : playerList){
+            session.delete(ppd);
+        }
         session.getTransaction().commit();
         session.close();
     }

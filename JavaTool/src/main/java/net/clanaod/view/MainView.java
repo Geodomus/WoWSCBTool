@@ -12,7 +12,9 @@ import java.awt.event.ItemListener;
 import java.util.*;
 import java.util.List;
 
+import net.clanaod.domain.Day;
 import net.clanaod.domain.Player;
+import net.clanaod.domain.PlayerPlaysDay;
 import net.clanaod.domain.Ship;
 import net.clanaod.domain_helper.DayHelper;
 import net.clanaod.domain_helper.PlayerHelper;
@@ -56,6 +58,9 @@ class MainView {
     private JTextField shipName;
     private JTextField shipType;
     private JPanel shipsPanel;
+    private JButton dayButton;
+    private JComboBox dayComboBox;
+    private JPanel timePanel;
     private Player player;
     private final ArrayList<JToggleButton> buttonList;
     private final ArrayList<JButton> shipButtonList;
@@ -87,6 +92,16 @@ class MainView {
         comboBox6.setModel(new DefaultComboBoxModel(oa));
         comboBox7.setModel(new DefaultComboBoxModel(oa));
         comboBox8.setModel(new DefaultComboBoxModel(oa));
+
+        List<Day> dayList = DayHelper.getAllDays();
+        Collections.sort(dayList);
+        Object[] oa1 = new Object[8];
+        oa1[0] = " - ";
+
+        for (int i = 0; i < dayList.size(); i++) {
+            oa1[i + 1] = dayList.get(i);
+        }
+        dayComboBox.setModel(new DefaultComboBoxModel(oa1));
     }
 
     private void loadShips(){
@@ -123,20 +138,18 @@ class MainView {
         ShipHelper.importShip("Wooster","CL");
     }
     private void loadDays(){
-        DayHelper.importDay("Monday");
-        DayHelper.importDay("Tuesday");
-        DayHelper.importDay("Wednesday");
-        DayHelper.importDay("Thursday");
-        DayHelper.importDay("Friday");
-        DayHelper.importDay("Saturday");
-        DayHelper.importDay("Sunday");
+        DayHelper.importDay("Monday", (byte)0);
+        DayHelper.importDay("Tuesday", (byte)1);
+        DayHelper.importDay("Wednesday", (byte)2);
+        DayHelper.importDay("Thursday", (byte)3);
+        DayHelper.importDay("Friday", (byte)4);
+        DayHelper.importDay("Saturday", (byte)5);
+        DayHelper.importDay("Sunday", (byte)6);
     }
 
     private MainView() {
         loadShips();
         loadDays();
-        dv = new DayView();
-        dv.setSize(500,400);
         shipList = ShipHelper.getAllShips();
         Collections.sort(shipList);
         label1.setText("");
@@ -165,17 +178,17 @@ class MainView {
                 changed();
             }
         });
+        timePanel.setLayout(new GridLayout(0,6));
         shipPanel.setLayout(new GridLayout(0,4));
         buttonList = new ArrayList<JToggleButton>();
         shipButtonList = new ArrayList<JButton>();
         shipsPanel.setLayout(new GridLayout(0, 8));
         refreshShips();
-        dv.setVisible(true);
 
         comboBox1.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!e.getItem().toString().equals(" - ")) {
+                    if (e.getItem() instanceof Player) {
                         Player p1 = (Player) e.getItem();
                         Set<Ship> shipSet = p1.getShips();
                         ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
@@ -253,7 +266,7 @@ class MainView {
         comboBox2.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!e.getItem().toString().equals(" - ")) {
+                    if (e.getItem() instanceof Player) {
                         Player p1 = (Player) e.getItem();
                         Set<Ship> shipSet = p1.getShips();
                         ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
@@ -331,7 +344,7 @@ class MainView {
         comboBox3.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!e.getItem().toString().equals(" - ")) {
+                    if (e.getItem() instanceof Player) {
                         Player p1 = (Player) e.getItem();
                         Set<Ship> shipSet = p1.getShips();
                         ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
@@ -409,7 +422,7 @@ class MainView {
         comboBox4.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!e.getItem().toString().equals(" - ")) {
+                    if (e.getItem() instanceof Player) {
                         Player p1 = (Player) e.getItem();
                         Set<Ship> shipSet = p1.getShips();
                         ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
@@ -487,7 +500,7 @@ class MainView {
         comboBox5.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!e.getItem().toString().equals(" - ")) {
+                    if (e.getItem() instanceof Player) {
                         Player p1 = (Player) e.getItem();
                         Set<Ship> shipSet = p1.getShips();
                         ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
@@ -565,7 +578,7 @@ class MainView {
         comboBox6.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!e.getItem().toString().equals(" - ")) {
+                    if (e.getItem() instanceof Player) {
                         Player p1 = (Player) e.getItem();
                         Set<Ship> shipSet = p1.getShips();
                         ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
@@ -643,7 +656,7 @@ class MainView {
         comboBox7.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!e.getItem().toString().equals(" - ")) {
+                    if (e.getItem() instanceof Player) {
                         Player p1 = (Player) e.getItem();
                         Set<Ship> shipSet = p1.getShips();
                         ArrayList<Ship> shipList = new ArrayList<Ship>(shipSet);
@@ -732,6 +745,7 @@ class MainView {
                 playerNotes.setEnabled(true);
                 saveButton.setEnabled(true);
                 deleteButton.setEnabled(true);
+                dayButton.setEnabled(true);
                 for(Ship ship : player.getShips()){
                     for(JToggleButton button : buttonList){
                         if(button.getText().equals(ship.getShipName() + "(" + ship.getShipType()+ ")")){
@@ -755,13 +769,14 @@ class MainView {
                 playerNotes.setEnabled(true);
                 playerNotes.setText("");
                 deleteButton.setEnabled(false);
+                dayButton.setEnabled(false);
                 saveButton.setEnabled(true);
             }
         });
         comboBox8.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if(e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!e.getItem().toString().equals(" - ")) {
+                    if (e.getItem() instanceof Player) {
                         loadButton.setEnabled(true);
                     } else {
                         loadButton.setEnabled(false);
@@ -776,6 +791,7 @@ class MainView {
                 playerName.setText("");
                 playerNotes.setEnabled(false);
                 playerNotes.setText("");
+                dayButton.setEnabled(false);
                 PlayerHelper.deletePlayer(player);
                 refreshComboBoxes();
             }
@@ -794,6 +810,7 @@ class MainView {
                 loadButton.setEnabled(false);
                 saveButton.setEnabled(false);
                 deleteButton.setEnabled(false);
+                dayButton.setEnabled(false);
                 for(JToggleButton button : buttonList){
                     button.setSelected(false);
                     button.setEnabled(true);
@@ -818,6 +835,45 @@ class MainView {
                 shipList = ShipHelper.getAllShips();
                 Collections.sort(shipList);
                 refreshShips();
+            }
+        });
+        dayButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(player.getId() != 0) {
+                    dv = new DayView(player);
+                    dv.setSize(500, 400);
+                    dv.setVisible(true);
+                }
+            }
+        });
+        dayComboBox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == ItemEvent.SELECTED){
+                    timePanel.removeAll();
+                    if(e.getItem() instanceof Day) {
+                        Day d = (Day) e.getItem();
+                        List<PlayerPlaysDay> playerPlaysDayList = DayHelper.getAllPlayersByDay(d);
+                        Collections.sort(playerPlaysDayList);
+                        for(PlayerPlaysDay ppd : playerPlaysDayList){
+                            JLabel l1 = new JLabel(ppd.getPlayer().getPlayerName());
+                            timePanel.add(l1);
+                            StringBuilder sb = new StringBuilder("");
+                            if(ppd.getTimeTo() != null || ppd.getTimefrom() != null) {
+                                if(ppd.getTimefrom() != null){
+                                    sb.append(ppd.getTimefrom().toString());
+                                }
+                                if(ppd.getTimeTo() != null){
+                                    sb.append(" - ");
+                                    sb.append(ppd.getTimeTo().toString());
+                                }
+                            }
+                            JLabel l2 = new JLabel(sb.toString());
+                            timePanel.add(l2);
+                        }
+                    }
+                    timePanel.revalidate();
+                    timePanel.repaint();
+                }
             }
         });
     }

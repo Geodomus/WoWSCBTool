@@ -4,11 +4,15 @@ import com.github.lgooddatepicker.components.TimePicker;
 import com.github.lgooddatepicker.components.TimePickerSettings;
 import net.clanaod.domain.Day;
 import net.clanaod.domain.Player;
+import net.clanaod.domain.PlayerPlaysDay;
 import net.clanaod.domain_helper.DayHelper;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.awt.event.*;
+import java.sql.Time;
+import java.util.Collections;
 
 public class DayView extends JDialog {
     private JPanel contentPane;
@@ -65,144 +69,88 @@ public class DayView extends JDialog {
         fromArray = new TimePicker[7];
         toArray = new TimePicker[7];
         cbArray = new JCheckBox[7];
-        for(Day day : DayHelper.getAllDays()){
-            if(day.getWeekday().equals("Monday")){
-                TimePicker tpFrom = new TimePicker(timeSettings);
-                fromArray[0] = tpFrom;
-                TimePicker tpTo = new TimePicker(timeSettings);
-                toArray[0] = tpTo;
-                JCheckBox cb = new JCheckBox("Mondays");
-                cbArray[0] = cb;
-                JLabel l1 = new JLabel("here From: ");
-                l1.setHorizontalAlignment(JLabel.RIGHT);
-                JLabel l2 = new JLabel("here To: ");
-                l2.setHorizontalAlignment(JLabel.RIGHT);
-                upperPanel.add(cb);
-                upperPanel.add(l1);
-                upperPanel.add(tpFrom);
-                upperPanel.add(l2);
-                upperPanel.add(tpTo);
+        List<Day> dayList = DayHelper.getAllDays();
+        Collections.sort(dayList);
+        for(int i = 0;i<7; i++){
+            PlayerPlaysDay ppd = DayHelper.getTimeByPlayerAndDayNumber(player, (byte)i);
+            TimePicker tpFrom = new TimePicker(timeSettings);
+            TimePicker tpTo = new TimePicker(timeSettings);
+            JCheckBox cb = new JCheckBox(dayList.get(i).getWeekday()+"s");
+            cb.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {
+                    for(int i=0;i<7;i++){
+                        if(cbArray[i]==e.getItem()){
+                            if(e.getStateChange() == ItemEvent.SELECTED){
+                                toArray[i].setEnabled(true);
+                                fromArray[i].setEnabled(true);
+                            } else {
+                                toArray[i].setEnabled(false);
+                                fromArray[i].setEnabled(false);
+                            }
+                        }
+                    }
+                }
+            });
+            if(ppd != null){
+                cb.setSelected(true);
+                tpTo.setEnabled(true);
+                tpFrom.setEnabled(true);
+                if(ppd.getTimefrom() != null){
+                    tpFrom.setTime(ppd.getTimefrom().toLocalTime());
+                }
+                if(ppd.getTimeTo() != null){
+                    tpTo.setTime(ppd.getTimeTo().toLocalTime());
+                }
+            } else{
+                cb.setSelected(false);
+                tpTo.setEnabled(false);
+                tpFrom.setEnabled(false);
             }
-            if(day.getWeekday().equals("Tuesday")){
-                TimePicker tpFrom = new TimePicker(timeSettings);
-                fromArray[1] = tpFrom;
-                TimePicker tpTo = new TimePicker(timeSettings);
-                toArray[1] = tpTo;
-                JCheckBox cb = new JCheckBox("Tuesdays");
-                cbArray[1] = cb;
-                JLabel l1 = new JLabel("here From: ");
-                l1.setHorizontalAlignment(JLabel.RIGHT);
-                JLabel l2 = new JLabel("here To: ");
-                l2.setHorizontalAlignment(JLabel.RIGHT);
-                upperPanel.add(cb);
-                upperPanel.add(l1);
-                upperPanel.add(tpFrom);
-                upperPanel.add(l2);
-                upperPanel.add(tpTo);
-            }
-            if(day.getWeekday().equals("Wednesday")){
-                TimePicker tpFrom = new TimePicker(timeSettings);
-                fromArray[2] = tpFrom;
-                TimePicker tpTo = new TimePicker(timeSettings);
-                toArray[2] = tpTo;
-                JCheckBox cb = new JCheckBox("Wednesd.");
-                cbArray[2] = cb;
-                JLabel l1 = new JLabel("here From: ");
-                l1.setHorizontalAlignment(JLabel.RIGHT);
-                JLabel l2 = new JLabel("here To: ");
-                l2.setHorizontalAlignment(JLabel.RIGHT);
-                upperPanel.add(cb);
-                upperPanel.add(l1);
-                upperPanel.add(tpFrom);
-                upperPanel.add(l2);
-                upperPanel.add(tpTo);
-            }
-            if(day.getWeekday().equals("Thursday")){
-                TimePicker tpFrom = new TimePicker(timeSettings);
-                fromArray[3] = tpFrom;
-                TimePicker tpTo = new TimePicker(timeSettings);
-                toArray[3] = tpTo;
-                JCheckBox cb = new JCheckBox("Thursdays");
-                cbArray[3] = cb;
-                JLabel l1 = new JLabel("here From: ");
-                l1.setHorizontalAlignment(JLabel.RIGHT);
-                JLabel l2 = new JLabel("here To: ");
-                l2.setHorizontalAlignment(JLabel.RIGHT);
-                upperPanel.add(cb);
-                upperPanel.add(l1);
-                upperPanel.add(tpFrom);
-                upperPanel.add(l2);
-                upperPanel.add(tpTo);
-            }
-            if(day.getWeekday().equals("Friday")){
-                TimePicker tpFrom = new TimePicker(timeSettings);
-                fromArray[4] = tpFrom;
-                TimePicker tpTo = new TimePicker(timeSettings);
-                toArray[4] = tpTo;
-                JCheckBox cb = new JCheckBox("Fridays");
-                cbArray[4] = cb;
-                JLabel l1 = new JLabel("here From: ");
-                l1.setHorizontalAlignment(JLabel.RIGHT);
-                JLabel l2 = new JLabel("here To: ");
-                l2.setHorizontalAlignment(JLabel.RIGHT);
-                upperPanel.add(cb);
-                upperPanel.add(l1);
-                upperPanel.add(tpFrom);
-                upperPanel.add(l2);
-                upperPanel.add(tpTo);
-            }
-            if(day.getWeekday().equals("Saturday")){
-                TimePicker tpFrom = new TimePicker(timeSettings);
-                fromArray[5] = tpFrom;
-                TimePicker tpTo = new TimePicker(timeSettings);
-                toArray[5] = tpTo;
-                JCheckBox cb = new JCheckBox("Saturdays");
-                cbArray[5] = cb;
-                JLabel l1 = new JLabel("here From: ");
-                l1.setHorizontalAlignment(JLabel.RIGHT);
-                JLabel l2 = new JLabel("here To: ");
-                l2.setHorizontalAlignment(JLabel.RIGHT);
-                upperPanel.add(cb);
-                upperPanel.add(l1);
-                upperPanel.add(tpFrom);
-                upperPanel.add(l2);
-                upperPanel.add(tpTo);
-            }
-
-            if(day.getWeekday().equals("Sunday")){
-                TimePicker tpFrom = new TimePicker(timeSettings);
-                fromArray[6] = tpFrom;
-                TimePicker tpTo = new TimePicker(timeSettings);
-                toArray[6] = tpTo;
-                JCheckBox cb = new JCheckBox("Sundays");
-                cbArray[6] = cb;
-                JLabel l1 = new JLabel("here From: ");
-                l1.setHorizontalAlignment(JLabel.RIGHT);
-                JLabel l2 = new JLabel("here To: ");
-                l2.setHorizontalAlignment(JLabel.RIGHT);
-                upperPanel.add(cb);
-                upperPanel.add(l1);
-                upperPanel.add(tpFrom);
-                upperPanel.add(l2);
-                upperPanel.add(tpTo);
-            }
+            toArray[i] = tpTo;
+            fromArray[i] = tpFrom;
+            cbArray[i] = cb;
+            JLabel l1 = new JLabel("here From: ");
+            l1.setHorizontalAlignment(JLabel.RIGHT);
+            JLabel l2 = new JLabel("here To: ");
+            l2.setHorizontalAlignment(JLabel.RIGHT);
+            upperPanel.add(cb);
+            upperPanel.add(l1);
+            upperPanel.add(tpFrom);
+            upperPanel.add(l2);
+            upperPanel.add(tpTo);
         }
     }
 
     private void onOK() {
-        // add your code here
+        for(int i = 0; i<7; i++){
+            if(cbArray[i].isSelected()){
+                PlayerPlaysDay pd = new PlayerPlaysDay();
+                pd.setDay(DayHelper.getDayByNumber((byte)i));
+                pd.setPlayer(player);
+                if(fromArray[i].getTime() != null){
+                    Time fromTime = Time.valueOf(fromArray[i].getTime());
+                    pd.setTimefrom(fromTime);
+                }
+                if(toArray[i].getTime() != null){
+                    Time toTime = Time.valueOf(toArray[i].getTime());
+                    pd.setTimeTo(toTime);
+                }
+                DayHelper.savePlayerPlaysDay(pd);
+            } else {
+                DayHelper.deletePlayerPlaysDayByNumber(player,i);
+            }
+        }
         dispose();
     }
 
     private void onCancel() {
-        // add your code here if necessary
         dispose();
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         DayView dialog = new DayView();
         dialog.pack();
         dialog.setVisible(true);
         System.exit(0);
-    }
+    }*/
 }
