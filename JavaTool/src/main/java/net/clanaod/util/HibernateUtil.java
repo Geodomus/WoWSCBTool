@@ -1,8 +1,7 @@
 package net.clanaod.util;
 
 
-import net.clanaod.domain.Player;
-import net.clanaod.domain.Ship;
+import net.clanaod.domain.*;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -48,6 +47,8 @@ public class HibernateUtil {
                     cfg.setProperties(properties);
                     cfg.addAnnotatedClass(Ship.class);
                     cfg.addAnnotatedClass(Player.class);
+                    cfg.addAnnotatedClass(Day.class);
+                    cfg.addAnnotatedClass(PlayerPlaysDay.class);
 
                     sessionFactory = cfg.buildSessionFactory();
 

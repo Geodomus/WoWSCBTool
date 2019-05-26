@@ -4,6 +4,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -71,5 +72,13 @@ public class Player implements Comparable<Player> {
 
     public int compareTo(Player p) {
         return this.playerName.compareTo(p.playerName);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Player)) return false;
+        Player player = (Player) o;
+        return id == player.id;
     }
 }

@@ -14,6 +14,7 @@ import java.util.List;
 
 import net.clanaod.domain.Player;
 import net.clanaod.domain.Ship;
+import net.clanaod.domain_helper.DayHelper;
 import net.clanaod.domain_helper.PlayerHelper;
 import net.clanaod.domain_helper.ShipHelper;
 
@@ -59,6 +60,7 @@ class MainView {
     private final ArrayList<JToggleButton> buttonList;
     private final ArrayList<JButton> shipButtonList;
     private List<Ship> shipList;
+    private DayView dv;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("MainView");
@@ -120,9 +122,21 @@ class MainView {
         ShipHelper.importShip("Salem","CA");
         ShipHelper.importShip("Wooster","CL");
     }
+    private void loadDays(){
+        DayHelper.importDay("Monday");
+        DayHelper.importDay("Tuesday");
+        DayHelper.importDay("Wednesday");
+        DayHelper.importDay("Thursday");
+        DayHelper.importDay("Friday");
+        DayHelper.importDay("Saturday");
+        DayHelper.importDay("Sunday");
+    }
 
     private MainView() {
         loadShips();
+        loadDays();
+        dv = new DayView();
+        dv.setSize(500,400);
         shipList = ShipHelper.getAllShips();
         Collections.sort(shipList);
         label1.setText("");
@@ -156,6 +170,7 @@ class MainView {
         shipButtonList = new ArrayList<JButton>();
         shipsPanel.setLayout(new GridLayout(0, 8));
         refreshShips();
+        dv.setVisible(true);
 
         comboBox1.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
