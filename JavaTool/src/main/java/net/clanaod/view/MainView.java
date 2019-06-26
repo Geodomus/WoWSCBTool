@@ -3,14 +3,21 @@ package net.clanaod.view;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Stream;
 
+import javafx.stage.FileChooser;
 import net.clanaod.domain.Day;
 import net.clanaod.domain.Player;
 import net.clanaod.domain.PlayerPlaysDay;
@@ -18,6 +25,9 @@ import net.clanaod.domain.Ship;
 import net.clanaod.domain_helper.DayHelper;
 import net.clanaod.domain_helper.PlayerHelper;
 import net.clanaod.domain_helper.ShipHelper;
+import org.dhatim.fastexcel.reader.ReadableWorkbook;
+import org.dhatim.fastexcel.reader.Row;
+import org.dhatim.fastexcel.reader.Sheet;
 
 @SuppressWarnings("unchecked")
 class MainView {
@@ -60,6 +70,7 @@ class MainView {
     private JButton dayButton;
     private JComboBox dayComboBox;
     private JPanel timePanel;
+    private JButton importPlayersButton;
     private Player player;
     private final JComboBox[] jComboBoxes;
     private final JLabel[] noteLabels;
@@ -352,6 +363,37 @@ class MainView {
                     }
                     timePanel.revalidate();
                     timePanel.repaint();
+                }
+            }
+        });
+        importPlayersButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                FileFilter filter = new FileNameExtensionFilter("XLSX File","xlsx");
+                chooser.setFileFilter(filter);
+                // Dialog zum Oeffnen von Dateien anzeigen
+                int rueckgabeWert = chooser.showOpenDialog(panel1);
+
+                /* Abfrage, ob auf "Öffnen" geklickt wurde */
+                if(rueckgabeWert == JFileChooser.APPROVE_OPTION)
+                {
+                    // Ausgabe der ausgewaehlten Datei
+                    System.out.println("Die zu öffnende Datei ist: " +
+                            chooser.getSelectedFile().getName());
+                    try (InputStream is = new FileInputStream(chooser.getSelectedFile()); ReadableWorkbook wb = new ReadableWorkbook(is)) {
+                        Sheet sheet = wb.getFirstSheet();
+                        try (Stream<Row> rows = sheet.openStream()) {
+                            rows.forEach(r -> {
+                                //TODO actually do something with the excel reading and add possibility for multiple sub-divisions
+                                String playerName = r.getCellAsString(3).orElse(null);
+                                System.out.println(playerName);
+                            });
+                        }
+                    } catch (FileNotFoundException ex) {
+                        ex.printStackTrace();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         });
